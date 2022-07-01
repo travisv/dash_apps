@@ -3,7 +3,7 @@ from typing import Iterable, Mapping
 from dash import Input, Output, State, html
 from dash.exceptions import PreventUpdate
 from app import app, df
-from layouts import homepage, company_page
+from layouts import homepage, company_page, fred_page, industry_page
 
 import plotly.express as px
 import plotly.graph_objects as go
@@ -12,6 +12,11 @@ from plotly.subplots import make_subplots
 import dash_bootstrap_components as dbc
 
 import yfinance as yf
+from fredapi import Fred
+import pandas as pd
+
+fred = Fred(api_key='55b9ebb1f9d23c04330baa4d9f2abd40')
+
 
 ### Router ###
 @app.callback(Output("page-content", "children"), [Input("url", "pathname")])
@@ -22,7 +27,9 @@ def render_page_content(pathname):
     elif pathname == "/company_overview":
         return company_page
     elif pathname == "/page-2":
-        return html.P("Oh cool, this is page 2!")
+        return industry_page
+    elif pathname == "/fred":
+        return fred_page
     # If the user tries to reach a different page, return a 404 message
     return dbc.Jumbotron(
         [
@@ -55,9 +62,57 @@ def render_price_chart(ticker):
                 dict(count=6, label="6m", step="month", stepmode="backward"),
                 dict(count=1, label="YTD", step="year", stepmode="todate"),
                 dict(count=1, label="1y", step="year", stepmode="backward"),
+                dict(count=5, label="5y", step="year", stepmode="backward"),
+                dict(count=10, label="10y", step="year", stepmode="backward"),
+                dict(count=20, label="20y", step="year", stepmode="backward"),
                 dict(step="all")
             ])
     ))
+    return fig
+
+@app.callback(Output('fred-chart', 'figure'), Input('fred-dropdown', 'value'))
+def render_fred_chart(indicator):
+    '''Downloads data from FRED and displays in a chart.'''
+    if indicator is None:
+        raise PreventUpdate
+    data = fred.get_series(indicator)
+    data = pd.DataFrame(data, columns=['indicator']).dropna().reset_index()
+    fig = px.line(data, x='index', y='indicator')
+    fig.update_xaxes(
+        rangeslider_visible=True,
+        rangeselector=dict(
+            buttons=list([
+                dict(count=1, label="1m", step="month", stepmode="backward"),
+                dict(count=6, label="6m", step="month", stepmode="backward"),
+                dict(count=1, label="YTD", step="year", stepmode="todate"),
+                dict(count=1, label="1y", step="year", stepmode="backward"),
+                dict(count=10, label="10y", step="year", stepmode="backward"),
+                dict(step="all")
+            ])
+    ))
+    return fig
+
+@app.callback(Output('industry-chart', 'figure'),
+              Input('industry-dropdown', 'value'))
+def render_industry_chart(industry):
+    '''Displays industry chart'''
+    if industry is None:
+        raise PreventUpdate
+    dff = df[df['industry'] == industry]
+    dff = dff.groupby('year').sum().reset_index()
+    fig = px.bar(dff, x='year', y='revenue')
+    fig.update_xaxes(
+        rangeslider_visible=True,
+#        rangeselector=dict(
+#            buttons=list([
+#                dict(count=1, label="1m", step="month", stepmode="backward"),
+#                dict(count=6, label="6m", step="month", stepmode="backward"),
+#                dict(count=1, label="YTD", step="year", stepmode="todate"),
+#                dict(count=1, label="1y", step="year", stepmode="backward"),
+#                dict(count=10, label="10y", step="year", stepmode="backward"),
+#                dict(step="all")
+#            ])
+)
     return fig
 
 #######

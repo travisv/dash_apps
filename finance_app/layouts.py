@@ -8,24 +8,9 @@ import dash_bootstrap_components as dbc
 from app import app, df
 from styles import SIDEBAR_STYLE, CONTENT_STYLE, COMPANY_PAGE
 
-
-"""
-This app creates a simple sidebar layout using inline style arguments and the
-dbc.Nav component.
-
-dcc.Location is used to track the current location, and a callback uses the
-current location to render the appropriate page content. The active prop of
-each NavLink is set automatically according to the current pathname. To use
-this feature you must install dash-bootstrap-components >= 0.11.0.
-
-For more details on building multi-page Dash applications, check out the Dash
-documentation: https://dash.plot.ly/urls
-"""
-
-############
-# Components
-#############
-
+################
+### Dropdowns
+################
 ticker_dropdown = dbc.Container([
     dbc.Label('Select ticker:'),
     dcc.Dropdown(id='ticker-dropdown',
@@ -35,21 +20,21 @@ ticker_dropdown = dbc.Container([
                  style={'width':'250px'})
 ])
 
-
-price_chart = dbc.Container([
-    html.Br(),
-    html.Br(),
-    dbc.Label('Price chart:'),
-    dcc.Graph(id='price-chart')
+industry_dropdown = dbc.Container([
+    dbc.Label('Select industry:'),
+    dcc.Dropdown(id='industry-dropdown',
+                 value='Banks',
+                 options=[{'label': industry, 'value': industry}
+                          for industry in df['industry'].dropna().unique()]),
 ])
 
-industry_dropdown = dbc.Container([
+fred_dropdown = dbc.Container([
     dbc.Label('Select indicator:'),
-    dcc.Dropdown(id='industry_page_indicator_dropdown',
+    dcc.Dropdown(id='fred-dropdown',
                  placeholder='Choose an indicator',
-                 value='revenue',
+                 value='GDP',
                  options=[{'label': indicator, 'value': indicator}
-                          for indicator in ['Option 1', 'Option 2']]),
+                          for indicator in ['GDP', 'SP500']]),
 ])
 
 sidebar = html.Div(
@@ -64,6 +49,7 @@ sidebar = html.Div(
                 dbc.NavLink("Home", href="/", active="exact"),
                 dbc.NavLink("Company Overview", href="/company_overview", active="exact"),
                 dbc.NavLink("Industry Analysis", href="/page-2", active="exact"),
+                dbc.NavLink("FRED", href="fred", active="exact"),
             ],
             vertical=True,
             pills=True,
@@ -71,24 +57,54 @@ sidebar = html.Div(
     ],
     style=SIDEBAR_STYLE,
 )
+################
+### Charts
+################
+price_chart = dbc.Container([
+    html.Br(),
+    dbc.Label('Price chart:'),
+    dcc.Graph(id='price-chart')
+])
 
-#########
-# Pages
-#########
+fred_chart = dbc.Container([
+    html.Br(),
+    dbc.Label('FRED chart:'),
+    dcc.Graph(id='fred-chart')
+])
 
+industry_chart = dbc.Container([
+    html.Br(),
+    dbc.Label('Industry chart:'),
+    dcc.Graph(id='industry-chart')
+])
+
+##########
+### Pages
+##########
 content = html.Div(id="page-content", style=CONTENT_STYLE)
 
 homepage = dbc.Container([
     html.H1('Home Page'),
 ])
 
-
 company_page = dbc.Container([
     ticker_dropdown,
     price_chart
 ], style=COMPANY_PAGE)
 
+fred_page = dbc.Container([
+    fred_dropdown,
+    fred_chart
+])
 
+industry_page = dbc.Container([
+    industry_dropdown,
+    industry_chart
+])
+
+##############
+# Main Layout
+##############
 def main_layout() -> html.Div:
     return html.Div(
         children=[
@@ -98,27 +114,3 @@ def main_layout() -> html.Div:
         ]
     )
 
-
-#####
-# OLD
-#####
-#main_layout = html.Div([
-#    html.Div([
-#        dbc.NavbarSimple([
-#            # Dropdown to select the industry you want to look at
-#            dbc.DropdownMenu([
-#                dbc.DropdownMenuItem(industry, href=industry)
-#                for industry in industries], label='Select industry'),],
-#            brand='Home',brand_href='/', color='primary', dark=True,
-#            className='font-weight-bold'),
-#        dbc.Row([
-#            dbc.Col(lg=1, md=1, sm=1),
-#            dbc.Col([
-#                # Get location to display correct content based on url
-#                dcc.Location(id='location'),
-#                html.Div(id='main_content')
-#            ], lg=10),
-#        ]),
-#        html.Br(),
-#    ], style={'backgroundColor': '#E5ECF6'})
-#])
