@@ -11,12 +11,25 @@ from styles import SIDEBAR_STYLE, CONTENT_STYLE, COMPANY_PAGE
 ################
 ### Dropdowns
 ################
+COMMODITIES = {
+    'Gold':'CC=F',
+    'Crude Oil':'CL=F',
+    'Nat Gas':'NG=F',
+    'Corn':'ZC=F'
+}
+
 ticker_dropdown = dbc.Container([
     dbc.Label('Select ticker:'),
     dcc.Dropdown(id='ticker-dropdown',
+
                  value='^GSPC',
-                 options=[{'label': ticker, 'value': ticker}
-                          for ticker in df['symbol'].unique().tolist()],
+                 # Add in yfinance commodity tickers, need to make their own
+                 # page, not done yet
+                 options=[{'label': k, 'value': v}
+                          for k,v in  COMMODITIES.items()],
+                 # Commentted out for quick test of yfinance commodites
+                 #options=[{'label': ticker, 'value': ticker}
+                 #         for ticker in df['symbol'].unique().tolist()],
                  style={'width':'250px'})
 ])
 
