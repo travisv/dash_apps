@@ -9,21 +9,9 @@ from app import app, df
 from styles import SIDEBAR_STYLE, CONTENT_STYLE, COMPANY_PAGE
 from constants import COMMODITIES, FRED_INDICATORS
 
-''' DROPDOWNS '''
-ticker_dropdown = dbc.Container([
-    dbc.Label('Select ticker:'),
-    dcc.Dropdown(id='ticker-dropdown',
+from components.dropdowns import ticker_dropdown
 
-                 value='AAPL',
-                 # Add in yfinance commodity tickers, need to make their own
-                 # page, not done yet
-                 #options=[{'label': k, 'value': v}
-                          #for k,v in  COMMODITIES.items()],
-                 # Commentted out for quick test of yfinance commodites
-                 options=[{'label': ticker, 'value': ticker}
-                          for ticker in df['symbol'].unique().tolist()],
-                 style={'width':'250px'})
-])
+''' DROPDOWNS '''
 
 commodities_dropdown = dbc.Container([
     dbc.Label('Select commoidity:'),
