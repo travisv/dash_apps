@@ -7,29 +7,30 @@ import dash_bootstrap_components as dbc
 
 from app import app, df
 from styles import SIDEBAR_STYLE, CONTENT_STYLE, COMPANY_PAGE
+from constants import COMMODITIES, FRED_INDICATORS
 
-################
-### Dropdowns
-################
-COMMODITIES = {
-    'Gold':'CC=F',
-    'Crude Oil':'CL=F',
-    'Nat Gas':'NG=F',
-    'Corn':'ZC=F'
-}
-
+''' DROPDOWNS '''
 ticker_dropdown = dbc.Container([
     dbc.Label('Select ticker:'),
     dcc.Dropdown(id='ticker-dropdown',
 
-                 value='^GSPC',
+                 value='AAPL',
                  # Add in yfinance commodity tickers, need to make their own
                  # page, not done yet
+                 #options=[{'label': k, 'value': v}
+                          #for k,v in  COMMODITIES.items()],
+                 # Commentted out for quick test of yfinance commodites
+                 options=[{'label': ticker, 'value': ticker}
+                          for ticker in df['symbol'].unique().tolist()],
+                 style={'width':'250px'})
+])
+
+commodities_dropdown = dbc.Container([
+    dbc.Label('Select commoidity:'),
+    dcc.Dropdown(id='commodity-dropdown',
+                 value='^GSPC',
                  options=[{'label': k, 'value': v}
                           for k,v in  COMMODITIES.items()],
-                 # Commentted out for quick test of yfinance commodites
-                 #options=[{'label': ticker, 'value': ticker}
-                 #         for ticker in df['symbol'].unique().tolist()],
                  style={'width':'250px'})
 ])
 
@@ -46,37 +47,22 @@ fred_dropdown = dbc.Container([
     dcc.Dropdown(id='fred-dropdown',
                  placeholder='Choose an indicator',
                  value='GDP',
-                 options=[{'label': indicator, 'value': indicator}
-                          for indicator in ['GDP', 'SP500']]),
+                 options=[{'label': k, 'value': v}
+                          for k,v in FRED_INDICATORS.items()]),
 ])
 
-sidebar = html.Div(
-    [
-        html.H2("Fiancial Analysis", className="display-6"),
-        html.Hr(),
-        html.P(
-            "Select a page below", className="lead"
-        ),
-        dbc.Nav(
-            [
-                dbc.NavLink("Home", href="/", active="exact"),
-                dbc.NavLink("Company Overview", href="/company_overview", active="exact"),
-                dbc.NavLink("Industry Analysis", href="/page-2", active="exact"),
-                dbc.NavLink("FRED", href="fred", active="exact"),
-            ],
-            vertical=True,
-            pills=True,
-        ),
-    ],
-    style=SIDEBAR_STYLE,
-)
-################
-### Charts
-################
+''' CHARTS '''
+
 price_chart = dbc.Container([
     html.Br(),
     dbc.Label('Price chart:'),
     dcc.Graph(id='price-chart')
+])
+
+commodity_chart = dbc.Container([
+    html.Br(),
+    dbc.Label('Commodity chart:'),
+    dcc.Graph(id='commodity-chart')
 ])
 
 fred_chart = dbc.Container([
@@ -91,13 +77,14 @@ industry_chart = dbc.Container([
     dcc.Graph(id='industry-chart')
 ])
 
-##########
-### Pages
-##########
-content = html.Div(id="page-content", style=CONTENT_STYLE)
-
+''' PAGES '''
 homepage = dbc.Container([
     html.H1('Home Page'),
+])
+
+commodity_page = dbc.Container([
+    commodities_dropdown,
+    commodity_chart
 ])
 
 company_page = dbc.Container([
@@ -118,6 +105,31 @@ industry_page = dbc.Container([
 ##############
 # Main Layout
 ##############
+
+sidebar = html.Div(
+    [
+        html.H2("Fiancial Analysis", className="display-6"),
+        html.Hr(),
+        html.P(
+            "Select a page below", className="lead"
+        ),
+        dbc.Nav(
+            [
+                dbc.NavLink("Home", href="/", active="exact"),
+                dbc.NavLink("Company Overview", href="/company_overview", active="exact"),
+                dbc.NavLink("Industry Analysis", href="/industries", active="exact"),
+                dbc.NavLink("FRED", href="/fred", active="exact"),
+                dbc.NavLink("Commodities", href="/commodities", active="exact"),
+            ],
+            vertical=True,
+            pills=True,
+        ),
+    ],
+    style=SIDEBAR_STYLE,
+)
+
+content = html.Div(id="page-content", style=CONTENT_STYLE)
+
 def main_layout() -> html.Div:
     return html.Div(
         children=[
