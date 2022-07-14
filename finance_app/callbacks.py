@@ -113,6 +113,7 @@ def render_industry_chart(industry):
             fig.layout[k].update(matches=None)
     return fig
 
+
 ### Commodity chart ###
 @app.callback(Output('commodity-chart', 'figure'),
               Input('commodity-dropdown', 'value'))

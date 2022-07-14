@@ -5,7 +5,19 @@ COMMODITIES = {
     'Gold':'CC=F',
     'Crude Oil':'CL=F',
     'Nat Gas':'NG=F',
-    'Corn':'ZC=F'
+    'Corn':'ZC=F',
+    'Silver':'SI=F',
+    'Copper':'HG=F',
+    'Soybean':'ZS=F',
+    'Feeder Cattle':'GF=F',
+    'Live Cattle':'LE=F',
+    'Lean Hogs':'HE=F',
+    'Lumber':'LBS=F',
+    'Orange Juice':'OJ=F',
+    'Sugar':'SB=F',
+    'Cotton':'CT=F',
+    'Coffee':'KC=F',
+
 }
 
 FRED_INDICATORS = {

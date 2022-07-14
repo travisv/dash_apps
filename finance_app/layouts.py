@@ -7,63 +7,9 @@ import dash_bootstrap_components as dbc
 
 from app import app, df
 from styles import SIDEBAR_STYLE, CONTENT_STYLE, COMPANY_PAGE
-from constants import COMMODITIES, FRED_INDICATORS
 
-from components.dropdowns import ticker_dropdown
-
-''' DROPDOWNS '''
-
-commodities_dropdown = dbc.Container([
-    dbc.Label('Select commoidity:'),
-    dcc.Dropdown(id='commodity-dropdown',
-                 value='^GSPC',
-                 options=[{'label': k, 'value': v}
-                          for k,v in  COMMODITIES.items()],
-                 style={'width':'250px'})
-])
-
-industry_dropdown = dbc.Container([
-    dbc.Label('Select industry:'),
-    dcc.Dropdown(id='industry-dropdown',
-                 value='Banks',
-                 options=[{'label': industry, 'value': industry}
-                          for industry in df['industry'].dropna().unique()]),
-])
-
-fred_dropdown = dbc.Container([
-    dbc.Label('Select indicator:'),
-    dcc.Dropdown(id='fred-dropdown',
-                 placeholder='Choose an indicator',
-                 value='GDP',
-                 options=[{'label': k, 'value': v}
-                          for k,v in FRED_INDICATORS.items()]),
-])
-
-''' CHARTS '''
-
-price_chart = dbc.Container([
-    html.Br(),
-    dbc.Label('Price chart:'),
-    dcc.Graph(id='price-chart')
-])
-
-commodity_chart = dbc.Container([
-    html.Br(),
-    dbc.Label('Commodity chart:'),
-    dcc.Graph(id='commodity-chart')
-])
-
-fred_chart = dbc.Container([
-    html.Br(),
-    dbc.Label('FRED chart:'),
-    dcc.Graph(id='fred-chart')
-])
-
-industry_chart = dbc.Container([
-    html.Br(),
-    dbc.Label('Industry chart:'),
-    dcc.Graph(id='industry-chart')
-])
+from components.dropdowns import ticker_dropdown, commodities_dropdown, industry_dropdown, fred_dropdown
+from components.charts import commodity_chart, price_chart, fred_chart, industry_chart
 
 ''' PAGES '''
 homepage = dbc.Container([
