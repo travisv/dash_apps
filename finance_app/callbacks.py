@@ -39,10 +39,8 @@ def render_page_content(pathname):
     )
 
 ### Price chart ###
-@app.callback(
-    Output('price-chart', 'figure'),
-    Input('ticker-dropdown', 'value')
-)
+@app.callback(Output('price-chart', 'figure'),
+    Input('ticker-dropdown', 'value'))
 def render_price_chart(ticker):
     '''Downloads price data from yfinance and displays in a chart price history.'''
     if ticker is None:
@@ -69,23 +67,24 @@ def render_price_chart(ticker):
     return fig
 
 ### FRED chart ###
-@app.callback(Output('fred-chart', 'figure'), Input('fred-dropdown', 'value'))
-def render_fred_chart(indicator):
+@app.callback(Output('fred-chart', 'figure'),
+              Input('fred-dropdown', 'value'),
+              Input('log-switch', 'on'))
+def render_fred_chart(indicator, log_switch):
     '''Downloads data from FRED and displays in a chart.'''
     if indicator is None:
         raise PreventUpdate
     data = fred.get_series(indicator)
     data = pd.DataFrame(data, columns=['indicator']).dropna().reset_index()
-    fig = px.line(data, x='index', y='indicator')
+    fig = px.area(data, x='index', y='indicator', log_y=log_switch)
     fig.update_xaxes(
         rangeslider_visible=True,
         rangeselector=dict(
             buttons=list([
-                dict(count=1, label="1m", step="month", stepmode="backward"),
-                dict(count=6, label="6m", step="month", stepmode="backward"),
-                dict(count=1, label="YTD", step="year", stepmode="todate"),
                 dict(count=1, label="1y", step="year", stepmode="backward"),
+                dict(count=5, label="5y", step="year", stepmode="backward"),
                 dict(count=10, label="10y", step="year", stepmode="backward"),
+                dict(count=25, label="25y", step="year", stepmode="backward"),
                 dict(step="all")
             ])
     ))

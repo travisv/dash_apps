@@ -4,6 +4,7 @@ import pandas as pd
 import dash
 from dash import dcc, html, dash_table
 import dash_bootstrap_components as dbc
+import dash_daq as daq
 
 from app import app, df
 from styles import SIDEBAR_STYLE, CONTENT_STYLE, COMPANY_PAGE
@@ -28,6 +29,7 @@ company_page = dbc.Container([
 
 fred_page = dbc.Container([
     fred_dropdown,
+    daq.BooleanSwitch(id='log-switch', on=False, label='log-Y', labelPosition='top', color='#9B51E0'),
     fred_chart
 ])
 
